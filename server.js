@@ -34,12 +34,13 @@ const corsOptions = {
     // Production allowed origins
     const allowedOrigins = [
       process.env.CLIENT_URL || 'http://localhost:3000',
+      process.env.CORS_ORIGIN,
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:3002',
       'http://localhost:3003',
       'http://localhost:5173'
-    ];
+    ].filter(Boolean); // Remove undefined values
     
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
@@ -51,9 +52,13 @@ const corsOptions = {
   credentials: true
 };
 
-// Initialize Socket.io
+// Initialize Socket.io with better deployment configuration
 const io = socketio(server, {
-  cors: corsOptions
+  cors: corsOptions,
+  transports: ['websocket', 'polling'],
+  allowEIO3: true,
+  pingTimeout: 60000,
+  pingInterval: 25000
 });
 
 // Make io accessible to our routes
@@ -146,6 +151,28 @@ app.use((req, res, next) => {
 
 // Error handler (must be last)
 app.use(errorHandler);
+
+// Socket.io connection handling
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+  
+  // Handle room joining
+  socket.on('join-room', (roomId) => {
+    socket.join(roomId);
+    console.log(`User ${socket.id} joined room ${roomId}`);
+  });
+  
+  // Handle room leaving
+  socket.on('leave-room', (roomId) => {
+    socket.leave(roomId);
+    console.log(`User ${socket.id} left room ${roomId}`);
+  });
+  
+  // Handle disconnection
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;
