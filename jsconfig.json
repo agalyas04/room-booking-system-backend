@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "allowJs": true,
+    "checkJs": false,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "controllers/**/*.js",
+    "models/**/*.js",
+    "routes/**/*.js",
+    "middleware/**/*.js",
+    "config/**/*.js",
+    "utils/**/*.js",
+    "scripts/**/*.js",
+    "server.js"
+  ],
+  "exclude": [
+    "node_modules/**/*",
+    "dist/**/*",
+    "**/controller/**/*"
+  ]
+}
